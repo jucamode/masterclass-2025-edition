@@ -1,5 +1,6 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
+import { useErrorStore } from '@/stores/error'
 import { taskQuery, type Task } from '@/utils/supaQueries'
 
 const route = useRoute('/tasks/[id]')
@@ -13,8 +14,8 @@ watch(
 )
 
 const getTasks = async () => {
-  const { data, error } = await taskQuery(route.params.id)
-  if (error) console.log(error)
+  const { data, error, status } = await taskQuery(route.params.id)
+  if (error) useErrorStore().setError({ error, customCode: status })
   task.value = data
 }
 await getTasks()
