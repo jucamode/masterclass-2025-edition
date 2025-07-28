@@ -1,13 +1,14 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
 import { login } from '@/utils/supaAuth'
+import { useFormErrors } from '@/composables/formErrors'
 
 const formData = ref({
   email: '',
   password: '',
 })
 
-const _error = ref('')
+const { serverError, handleServerError } = useFormErrors()
 
 const router = useRouter()
 
@@ -15,8 +16,7 @@ const signin = async () => {
   const { error } = await login(formData.value)
   if (!error) router.push('/')
 
-  _error.value =
-    error?.message === 'Invalid login credentials' ? 'Incorrect email or password' : error?.message
+  handleServerError(error)
 }
 </script>
 
@@ -41,7 +41,7 @@ const signin = async () => {
               placeholder="johndoe19@example.com"
               required
               v-model="formData.email"
-              :class="{ 'border-red-500': _error }"
+              :class="{ 'border-red-500': serverError }"
             />
           </div>
           <div class="grid gap-2">
@@ -55,12 +55,12 @@ const signin = async () => {
               autocomplete
               required
               v-model="formData.password"
-              :class="{ 'border-red-500': _error }"
+              :class="{ 'border-red-500': serverError }"
             />
           </div>
-          <ul class="text-sm text-left text-red-500" v-if="_error">
+          <ul class="text-sm text-left text-red-500" v-if="serverError">
             <li class="list-disc">
-              {{ _error }}
+              {{ serverError }}
             </li>
           </ul>
           <Button type="submit" class="w-full"> Login </Button>
